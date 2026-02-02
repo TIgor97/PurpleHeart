@@ -56,9 +56,6 @@ const APP_CONFIG = {
       openDate: "2026-02-02"
     }
   ],
-  visitedCountries: [
-  { id: "SRB", name: "Serbia", date: "2024-08-02", note: "Where it all began" }
-  ],
   userData: {
     "cryspyfly@gmail.com": {
       floatingBubbles: [

@@ -15,8 +15,7 @@ const state = {
   slideshows: [...APP_CONFIG.slideshows],
   musicTracks: [...APP_CONFIG.musicTracks],
   activeUser: null,
-  userBubbles: [],
-  visitedCountries: [...APP_CONFIG.visitedCountries]
+  userBubbles: []
 };
 
 const storageKey = "purple-heart-state";
@@ -730,104 +729,6 @@ const initApp = () => {
   initSlideshows();
   initMusicPlayer();
   setupConfigAdmin();
-loadWorldMap();
 };
 
 document.addEventListener("DOMContentLoaded", initApp);
-
-
-
-
-// Funkcija za pretvaranje ISO koda u Emoji zastavu
-const getFlagEmoji = (countryCode) => {
-    return countryCode.toUpperCase().replace(/./g, char => 
-        String.fromCodePoint(char.charCodeAt(0) + 127397)
-    );
-};
-
-const renderTravels = () => {
-    const list = document.getElementById("countries-list");
-    if (!list) return;
-
-    list.innerHTML = "";
-    
-    // Sortiramo države po imenu
-    const sortedKeys = Object.keys(APP_CONFIG.allCountries).sort((a, b) => 
-        APP_CONFIG.allCountries[a].localeCompare(APP_CONFIG.allCountries[b])
-    );
-
-    sortedKeys.forEach(code => {
-        const name = APP_CONFIG.allCountries[code];
-        const isVisited = state.visitedCountries.some(v => v.id === code);
-        
-        const div = document.createElement("div");
-        div.className = `country-item ${isVisited ? 'visited' : ''}`;
-        div.innerHTML = `
-            <span class="flag-icon">${getFlagEmoji(code)}</span>
-            <span>${name}</span>
-            <span style="margin-left:auto">${isVisited ? '💜' : ''}</span>
-        `;
-        
-        div.onclick = () => toggleCountry(code);
-        list.appendChild(div);
-
-        // Bojenje mape (ako path sa tim ID-om postoji)
-        const path = document.getElementById(code);
-        if (path) {
-            isVisited ? path.classList.add("visited") : path.classList.remove("visited");
-        }
-    });
-
-    updateTravelStats();
-};
-
-const toggleCountry = (code) => {
-    const index = state.visitedCountries.findIndex(v => v.id === code);
-    if (index > -1) {
-        state.visitedCountries.splice(index, 1);
-    } else {
-        state.visitedCountries.push({ id: code, date: new Date().toISOString() });
-    }
-    saveState();
-    renderTravels();
-};
-
-const updateTravelStats = () => {
-    const total = Object.keys(APP_CONFIG.allCountries).length;
-    const visited = state.visitedCountries.length;
-    const percent = ((visited / total) * 100).toFixed(1);
-    const text = document.getElementById("travel-stats-text");
-    if (text) text.textContent = `We have explored ${visited} countries (${percent}%) of the world together!`;
-};
-
-// Pretraga
-const filterCountries = () => {
-    const query = document.getElementById("country-search").value.toLowerCase();
-    document.querySelectorAll(".country-item").forEach(item => {
-        const name = item.innerText.toLowerCase();
-        item.style.display = name.includes(query) ? "flex" : "none";
-    });
-};
-
-
-const loadWorldMap = async () => {
-    try {
-        // Putanja do tvog novog fajla
-        const response = await fetch('assets/worldMap.svg');
-        const svgText = await response.text();
-        
-        const mapContainer = document.getElementById('world-map-svg');
-        if (mapContainer) {
-            mapContainer.innerHTML = svgText;
-            
-            // VAŽNO: Tek kad se mapa učita, pozivamo renderTravels
-            // da bi JS mogao da pronađe države i oboji ih
-            renderTravels();
-        }
-    } catch (error) {
-        console.error("Greška pri učitavanju mape:", error);
-    }
-};
-
-// Pozovi ovu funkciju tamo gde inicijalizuješ aplikaciju
-// npr. unutar DOMContentLoaded ili na kraju app.js
