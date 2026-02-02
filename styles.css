@@ -779,3 +779,34 @@ button.small {
     fill: var(--accent) !important;
     filter: drop-shadow(0 0 5px var(--glow));
 }
+
+.country-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+}
+
+.country-item:hover {
+    background: rgba(157, 78, 221, 0.1);
+}
+
+.country-item.visited {
+    background: rgba(157, 78, 221, 0.2);
+}
+
+.country-item .flag {
+    margin-right: 15px;
+    font-size: 1.4rem;
+}
+
+.country-item .name {
+    flex-grow: 1;
+    color: var(--text);
+}
+
+.country-item .heart {
+    font-size: 0.8rem;
+}

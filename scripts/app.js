@@ -1299,4 +1299,40 @@ const colorVisitedCountries = () => {
     });
 }; 
 
+const renderCountryList = () => {
+    const listContainer = document.getElementById('countries-list');
+    if (!listContainer) return;
+ 
+    const getFlag = (code) => code.toUpperCase().replace(/./g, char => 
+        String.fromCodePoint(char.charCodeAt(0) + 127397)
+    );
+
+    const countries = Object.entries(APP_CONFIG.allCountries).sort((a, b) => a[1].localeCompare(b[1]));
+
+    listContainer.innerHTML = countries.map(([code, name]) => {
+        const isVisited = APP_CONFIG.visitedCountries.some(v => v.id === code);
+        return `
+            <div class="country-item ${isVisited ? 'visited' : ''}" onclick="toggleCountry('${code}')">
+                <span class="flag">${getFlag(code)}</span>
+                <span class="name">${name}</span>
+                ${isVisited ? '<span class="heart">💜</span>' : ''}
+            </div>
+        `;
+    }).join('');
+};
+ 
+const toggleCountry = (code) => {
+    const index = APP_CONFIG.visitedCountries.findIndex(v => v.id === code);
+    
+    if (index > -1) {
+        APP_CONFIG.visitedCountries.splice(index, 1);
+    } else {
+        APP_CONFIG.visitedCountries.push({ id: code, date: new Date().toLocaleDateString() });
+    }
+     
+    colorVisitedCountries();
+    renderCountryList();
+    updateTravelStats();  
+};
+
 document.addEventListener("DOMContentLoaded", initApp);
