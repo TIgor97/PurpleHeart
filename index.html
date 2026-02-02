@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Love Story</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="config.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+  <div class="hearts-layer" aria-hidden="true"></div>
+  <div class="glow"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-heart">💜</span>
+      <div>
+        <p class="brand-title">The Purple Heart Chronicle</p>
+        <p class="brand-sub">1.5 years of us and forever to go</p>
+      </div>
+    </div>
+    <nav class="nav-tabs">
+      <button class="tab active" data-tab="home">Home</button>
+      <button class="tab" data-tab="notes">Notes</button>
+      <button class="tab" data-tab="memories">Memories</button>
+      <button class="tab" data-tab="wishes">Wishes</button>
+      <button class="tab" data-tab="dreams">Dreams</button>
+      <button class="tab" data-tab="love">Our Love</button>
+      <button class="tab" data-tab="vault">Vault</button>
+      <button class="tab" data-tab="admin">Config</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="tab-panel active">
+      <div class="hero">
+        <div>
+          <h1>Our story keeps glowing.</h1>
+          <p>
+            A space for the moments, the promises, and the dreams we keep
+            building together.
+          </p>
+          <div class="cta-row">
+            <button class="ghost" id="show-love-note">Open a love note</button>
+            <button class="solid" id="add-floating-message">Add new bubble</button>
+          </div>
+        </div>
+        <div class="counter-card">
+          <h3>Milestones</h3>
+          <div id="counters" class="counters"></div>
+          <button class="ghost small" id="add-event">Add another date</button>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-header">
+          <h2>Our Timeline</h2>
+          <div class="timeline-controls">
+            <button class="ghost small" id="timeline-prev">Prev</button>
+            <button class="ghost small" id="timeline-next">Next</button>
+          </div>
+        </div>
+        <div class="timeline-track" id="timeline-track"></div>
+      </div>
+
+      <div class="home-grid">
+        <div class="panel">
+          <h3>Daily Love Note</h3>
+          <p id="daily-note">Loading your note...</p>
+        </div>
+        <div class="panel">
+          <h3>Moments we cherish</h3>
+          <div class="memory-preview" id="memory-preview"></div>
+        </div>
+        <div class="panel">
+          <h3>Floating messages</h3>
+          <p>Sweet bubbles appear randomly. Add more from Config.</p>
+          <div id="bubble-container" class="bubble-container"></div>
+        </div>
+        <div class="panel">
+          <h3>Audio love notes</h3>
+          <p>Drop in audio snippets we can replay together.</p>
+          <div class="audio-recorder">
+            <button class="solid small" id="record-audio">Start recording</button>
+            <button class="ghost small" id="stop-audio" disabled>Stop</button>
+            <span id="record-status">Ready to record</span>
+          </div>
+          <div id="audio-notes" class="audio-list"></div>
+        </div>
+        <div class="panel">
+          <h3>Open when...</h3>
+          <p>Notes that unlock on their day.</p>
+          <div id="open-when" class="note-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="notes" class="tab-panel">
+      <div class="section-header">
+        <h2>Notes</h2>
+        <p>Leave gentle notes for each other whenever you want.</p>
+      </div>
+      <div class="note-layout">
+        <form id="notes-form" class="note-form">
+          <input type="text" name="title" placeholder="Title" required />
+          <textarea name="body" rows="5" placeholder="Write your note..." required></textarea>
+          <button class="solid" type="submit">Save note</button>
+        </form>
+        <div id="notes-list" class="note-list"></div>
+      </div>
+    </section>
+
+    <section id="memories" class="tab-panel">
+      <div class="section-header">
+        <h2>Memories</h2>
+        <p>Collect photos, slideshows, and collages we treasure.</p>
+      </div>
+      <div class="memory-layout">
+        <form id="memories-form" class="note-form">
+          <input type="url" name="url" placeholder="Image URL" required />
+          <input type="text" name="caption" placeholder="Caption" />
+          <button class="solid" type="submit">Add memory</button>
+        </form>
+        <form id="collage-form" class="note-form">
+          <input type="text" name="title" placeholder="Collage title" required />
+          <textarea name="urls" rows="4" placeholder="Paste image URLs, one per line" required></textarea>
+          <button class="solid" type="submit">Create collage</button>
+        </form>
+        <form id="slideshow-form" class="note-form">
+          <input type="text" name="title" placeholder="Slideshow title" required />
+          <textarea name="urls" rows="4" placeholder="Paste image URLs, one per line" required></textarea>
+          <button class="solid" type="submit">Create slideshow</button>
+        </form>
+        <div id="memories-gallery" class="memory-gallery"></div>
+        <div id="collage-gallery" class="collage-gallery"></div>
+        <div id="slideshow-gallery" class="slideshow-gallery"></div>
+      </div>
+    </section>
+
+    <section id="wishes" class="tab-panel">
+      <div class="section-header">
+        <h2>Wishes</h2>
+        <p>Promise our future, together.</p>
+      </div>
+      <div class="note-layout">
+        <form id="wishes-form" class="note-form">
+          <input type="text" name="title" placeholder="Wish title" required />
+          <textarea name="body" rows="5" placeholder="A future wish..." required></textarea>
+          <button class="solid" type="submit">Save wish</button>
+        </form>
+        <div id="wishes-list" class="note-list"></div>
+      </div>
+    </section>
+
+    <section id="dreams" class="tab-panel">
+      <div class="section-header">
+        <h2>Dreams</h2>
+        <p>Write the dreams we want to live inside of.</p>
+      </div>
+      <div class="note-layout">
+        <form id="dreams-form" class="note-form">
+          <input type="text" name="title" placeholder="Dream title" required />
+          <textarea name="body" rows="5" placeholder="Our dream..." required></textarea>
+          <button class="solid" type="submit">Save dream</button>
+        </form>
+        <div id="dreams-list" class="note-list"></div>
+      </div>
+    </section>
+
+    <section id="love" class="tab-panel">
+      <div class="section-header">
+        <h2>Our Love</h2>
+        <p>Make our heart grow with every visit.</p>
+      </div>
+      <div class="love-layout">
+        <div class="love-heart" id="love-heart">
+          <span>💜</span>
+          <p id="love-level">Love level: 1</p>
+          <button class="solid" id="grow-love">Grow our heart</button>
+        </div>
+        <div class="love-message">
+          <h3>Leave a love message</h3>
+          <form id="love-form" class="note-form">
+            <textarea name="body" rows="4" placeholder="Say something beautiful..." required></textarea>
+            <button class="solid" type="submit">Send</button>
+          </form>
+          <div id="love-messages" class="note-list"></div>
+        </div>
+        <div class="love-image">
+          <h3>Post a photo</h3>
+          <form id="love-image-form" class="note-form">
+            <input type="url" name="url" placeholder="Image URL" required />
+            <input type="text" name="caption" placeholder="Caption" />
+            <button class="solid" type="submit">Add</button>
+          </form>
+          <div id="love-images" class="memory-gallery"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="vault" class="tab-panel">
+      <div class="section-header">
+        <h2>Our Vault</h2>
+        <p>A private space for the notes only we can read.</p>
+      </div>
+      <div class="note-layout">
+        <form id="vault-form" class="note-form">
+          <input type="text" name="title" placeholder="Secret title" required />
+          <textarea name="body" rows="5" placeholder="A private promise..." required></textarea>
+          <button class="solid" type="submit">Lock it in</button>
+        </form>
+        <div id="vault-list" class="note-list"></div>
+      </div>
+    </section>
+
+    <section id="admin" class="tab-panel">
+      <div class="section-header">
+        <h2>Config / Admin</h2>
+        <p>Sign in to manage shared messages, pop-up bubbles, and daily notes.</p>
+      </div>
+      <div id="admin-locked" class="admin-locked">
+        <div id="gsi-button"></div>
+        <p class="admin-hint">Only approved emails can access this panel.</p>
+      </div>
+      <div id="admin-panel" class="admin-panel hidden">
+        <div class="admin-section">
+          <h3>Floating Messages</h3>
+          <form id="floating-form" class="note-form">
+            <input type="text" name="message" placeholder="Message" required />
+            <button class="solid" type="submit">Add message</button>
+          </form>
+          <div id="floating-list" class="note-list"></div>
+        </div>
+        <div class="admin-section">
+          <h3>Daily Notes</h3>
+          <form id="daily-form" class="note-form">
+            <textarea name="note" rows="3" placeholder="Daily note" required></textarea>
+            <button class="solid" type="submit">Add daily note</button>
+          </form>
+          <div id="daily-list" class="note-list"></div>
+        </div>
+        <div class="admin-section">
+          <h3>Memory Images</h3>
+          <form id="memory-form" class="note-form">
+            <input type="url" name="url" placeholder="Image URL" required />
+            <input type="text" name="caption" placeholder="Caption" />
+            <button class="solid" type="submit">Add memory</button>
+          </form>
+          <div id="admin-memories" class="memory-gallery"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="spotify-pill" id="spotify-pill">
+    <div class="pill-info">
+      <span>Now playing</span>
+      <strong>Spotify Playlist</strong>
+    </div>
+    <div class="pill-controls">
+      <button id="toggle-player">Open player</button>
+      <input type="range" min="0" max="100" value="75" id="volume-slider" />
+    </div>
+  </div>
+  <div class="spotify-player" id="spotify-player">
+    <iframe id="spotify-iframe" title="Spotify Player"
+      src="https://open.spotify.com/embed/playlist/3L9ySaeSt3ihvD12YLFkvi?theme=0"
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <p class="spotify-note">
+      Tip: tap shuffle in the player for a fresh randomized start each visit.
+    </p>
+  </div>
+
+  <div class="floating-message" id="floating-message"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
