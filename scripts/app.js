@@ -102,7 +102,10 @@ const initFirebase = () => {
   if (!firebase.apps.length) {
     firebase.initializeApp(APP_CONFIG.firebaseConfig);
   }
-  return firebase.firestore();
+  return {
+    db: firebase.firestore(),
+    auth: firebase.auth()
+  };
 };
 
 const initAnniversaryPopup = (db) => {
@@ -691,28 +694,38 @@ const initMusicPlayer = () => {
   });
 };
 
-const setupConfigAdmin = () => {
+const setupConfigAdmin = (firebaseAuth) => {
   const locked = document.getElementById("admin-locked");
   const signOut = document.getElementById("sign-out");
   const loginButton = document.getElementById("login-button");
-  if (!APP_CONFIG.googleClientId || APP_CONFIG.googleClientId.includes("PASTE")) {
+  const gsiButton = document.getElementById("gsi-button");
+
+  if (!firebaseAuth) {
     if (locked) {
-      locked.innerHTML = "<p>Add your Google Client ID in config.js to enable login.</p>";
+      locked.innerHTML = "<p>Firebase Auth missing.</p>";
     }
     return;
   }
 
-  google.accounts.id.initialize({
-    client_id: APP_CONFIG.googleClientId,
-    callback: (response) => {
-      const payload = JSON.parse(atob(response.credential.split(".")[1]));
-      if (APP_CONFIG.allowedEmails.includes(payload.email)) {
-        state.activeUser = payload.email;
-        saveAuthState(payload.email);
+  const provider = new firebase.auth.GoogleAuthProvider();
+
+  if (loginButton) {
+    loginButton.addEventListener("click", async () => {
+      showToast("Opening Google login...", "");
+      try {
+        const result = await firebaseAuth.signInWithPopup(provider);
+        const email = result.user?.email;
+        if (!email || !APP_CONFIG.allowedEmails.includes(email)) {
+          showToast("Login failed: access denied", "error");
+          await firebaseAuth.signOut();
+          return;
+        }
+        state.activeUser = email;
+        saveAuthState(email);
         showToast("Login successful 💜", "success");
-        const userConfig = APP_CONFIG.userData?.[payload.email];
+        const userConfig = APP_CONFIG.userData?.[email];
         state.userBubbles = userConfig?.floatingBubbles || [];
-        loadUserState(payload.email);
+        loadUserState(email);
         renderBubbles();
         renderNotes("vault-list", state.vaultNotes);
         renderNotes("notes-list", state.notes);
@@ -721,31 +734,22 @@ const setupConfigAdmin = () => {
         renderNotes("love-messages", state.loveMessages);
         updateAuthUI();
         updateBirthdays();
-      } else if (locked) {
-        showToast("Login failed: access denied", "error");
-        locked.innerHTML = "<p>Access denied.</p>";
+      } catch (error) {
+        showToast("Login failed", "error");
       }
-    }
-  });
-
-  google.accounts.id.renderButton(document.getElementById("gsi-button"), {
-    theme: "filled_black",
-    size: "large",
-    shape: "pill"
-  });
-
-  if (loginButton) {
-    loginButton.addEventListener("click", () => {
-      showToast("Opening Google login...", "");
-      google.accounts.id.prompt();
     });
   }
 
+  if (gsiButton) {
+    gsiButton.style.display = "none";
+  }
+
   if (signOut) {
-    signOut.addEventListener("click", () => {
+    signOut.addEventListener("click", async () => {
       state.activeUser = null;
       state.userBubbles = [];
       saveAuthState(null);
+      await firebaseAuth.signOut();
       updateAuthUI();
       updateBirthdays();
       renderBubbles();
@@ -762,6 +766,7 @@ const setupConfigAdmin = () => {
       if (home) home.classList.add("active");
     });
   }
+
   updateAuthUI();
 };
 
@@ -1032,8 +1037,10 @@ const initApp = () => {
   initYouTubePlaylist();
   initNotifications();
   initServiceWorker();
-  setupConfigAdmin();
-  const db = initFirebase();
+  const firebaseBundle = initFirebase();
+  const db = firebaseBundle?.db || null;
+  const firebaseAuth = firebaseBundle?.auth || null;
+  setupConfigAdmin(firebaseAuth);
   const listenForPosts = initAnniversaryPopup(db);
   if (listenForPosts && state.activeUser) {
     listenForPosts(state.activeUser);
