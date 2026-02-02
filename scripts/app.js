@@ -19,6 +19,7 @@ const state = {
 };
 
 const storageKey = "purple-heart-state";
+const authKey = "purple-heart-auth";
 const EXPIRY_MS = 24 * 60 * 60 * 1000;
 const notificationIcon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Ctext x='0' y='96' font-size='96'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E";
@@ -42,6 +43,28 @@ const applyStoredState = () => {
   const stored = getStoredState();
   if (!stored) return;
   Object.assign(state, stored);
+};
+
+const loadAuthState = () => {
+  const stored = localStorage.getItem(authKey);
+  if (!stored) return;
+  try {
+    const data = JSON.parse(stored);
+    if (data?.email && APP_CONFIG.allowedEmails.includes(data.email)) {
+      state.activeUser = data.email;
+      loadUserState(data.email);
+    }
+  } catch (error) {
+    localStorage.removeItem(authKey);
+  }
+};
+
+const saveAuthState = (email) => {
+  if (!email) {
+    localStorage.removeItem(authKey);
+    return;
+  }
+  localStorage.setItem(authKey, JSON.stringify({ email }));
 };
 
 const getUserStorageKey = (email) => `purple-heart-${email}`;
@@ -600,6 +623,7 @@ const setupConfigAdmin = () => {
       const payload = JSON.parse(atob(response.credential.split(".")[1]));
       if (APP_CONFIG.allowedEmails.includes(payload.email)) {
         state.activeUser = payload.email;
+        saveAuthState(payload.email);
         const userConfig = APP_CONFIG.userData?.[payload.email];
         state.userBubbles = userConfig?.floatingBubbles || [];
         loadUserState(payload.email);
@@ -627,6 +651,7 @@ const setupConfigAdmin = () => {
     signOut.addEventListener("click", () => {
       state.activeUser = null;
       state.userBubbles = [];
+      saveAuthState(null);
       updateAuthUI();
       updateBirthdays();
       renderBubbles();
@@ -882,6 +907,7 @@ const initConfetti = () => {
 
 const initApp = () => {
   applyStoredState();
+  loadAuthState();
   initTabs();
   startLoveCounter();
   renderDailyNote();
