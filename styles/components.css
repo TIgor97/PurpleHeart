@@ -46,7 +46,11 @@
 #login-button {
   display: inline-flex;
   justify-content: center;
-  width: 100%;
+  align-items: center;
+  width: auto;
+  padding: 0.55rem 1.4rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
 }
 
 .sidebar-footer {
