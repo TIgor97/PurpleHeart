@@ -1241,40 +1241,49 @@ const loadMap = async () => {
     }
 };
 
-
 let zoomLevel = 1;
 let isPanning = false;
-let startX, startY, scrollLeft, scrollTop;
+let startX, startY;
+let translateX = 0, translateY = 0;
 
 const setupZoomAndPan = () => {
     const mapContainer = document.querySelector('.map-box');
     const svgElement = document.querySelector('#world-map-svg svg');
+
+    if (!mapContainer || !svgElement) return;
  
     mapContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1;
-        zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 5);  
-        svgElement.style.transform = `scale(${zoomLevel})`;
+        const delta = e.deltaY > 0 ? -0.2 : 0.2;
+        zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 6);  
+        
+        applyTransform();
+    }, { passive: false });
+ 
+    mapContainer.addEventListener('mousedown', (e) => {
+        isPanning = true;
+        mapContainer.style.cursor = 'grabbing';
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isPanning) return;
+        
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        
+        applyTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+        isPanning = false;
+        mapContainer.style.cursor = 'grab';
     });
  
-    mapContainer.onmousedown = (e) => {
-        isPanning = true;
-        startX = e.pageX - svgElement.offsetLeft;
-        startY = e.pageY - svgElement.offsetTop;
-    };
-
-    window.onmouseup = () => {
-        isPanning = false;
-    };
-
-    mapContainer.onmousemove = (e) => {
-        if (!isPanning) return;
-        e.preventDefault();
-        const x = e.pageX - startX;
-        const y = e.pageY - startY; 
-        svgElement.style.marginLeft = `${x}px`;
-        svgElement.style.marginTop = `${y}px`;
-    };
+    function applyTransform() {
+        svgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomLevel})`;
+    }
 };
 
 const colorVisitedCountries = () => { 
