@@ -19,7 +19,7 @@
 body {
   font-family: "Manrope", sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top, #2c0a4a, var(--bg) 60%);
+  background: radial-gradient(circle at top, #24083a, #12001f 65%);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -51,13 +51,21 @@ h4 {
   z-index: 0;
 }
 
+.hearts-layer.blur {
+  filter: blur(6px);
+  opacity: 0.55;
+  transform: scale(1.06);
+}
+
 @keyframes floatHearts {
   0% {
     transform: translateY(0) translateX(0);
   }
+
   50% {
     transform: translateY(-120px) translateX(40px);
   }
+
   100% {
     transform: translateY(-240px) translateX(-20px);
   }
@@ -142,20 +150,22 @@ main {
 }
 
 .love-counter {
-  background: rgba(28, 6, 43, 0.8);
+  background: rgba(21, 4, 31, 0.78);
   border-radius: 2rem;
-  padding: 2.5rem clamp(1.5rem, 4vw, 3.5rem);
-  border: 1px solid rgba(157, 78, 221, 0.45);
-  box-shadow: 0 0 40px rgba(157, 78, 221, 0.35);
-  animation: breathe 4s ease-in-out infinite;
+  padding: 2.6rem clamp(1.5rem, 4vw, 3.5rem);
+  border: 1px dashed rgba(183, 124, 245, 0.6);
+  box-shadow: 0 0 30px rgba(157, 78, 221, 0.25);
+  min-width: min(520px, 88vw);
 }
 
 @keyframes breathe {
+
   0%,
   100% {
     box-shadow: 0 0 30px rgba(157, 78, 221, 0.25);
     transform: scale(1);
   }
+
   50% {
     box-shadow: 0 0 60px rgba(157, 78, 221, 0.55);
     transform: scale(1.02);
@@ -164,33 +174,70 @@ main {
 
 .love-label {
   color: var(--muted);
-  font-size: 0.95rem;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.02em;
 }
 
-.love-time {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 1rem;
-}
-
-.love-time span {
+.love-primary {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   color: var(--accent-soft);
+  margin-bottom: 0.4rem;
 }
 
-.love-time small {
-  display: block;
+.love-secondary {
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.love-foot {
+  margin-top: 1.4rem;
+  font-size: 0.9rem;
   color: var(--muted);
-  margin-top: 0.4rem;
+}
+
+.love-time {
+  display: none;
 }
 
 .home-actions {
-  display: flex;
+  display: none;
+}
+
+.birthday-card {
+  background: rgba(28, 8, 43, 0.7);
+  border-radius: 1.6rem;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid rgba(157, 78, 221, 0.35);
+  min-width: min(420px, 86vw);
+  display: grid;
   gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
+}
+
+.birthday-title {
+  font-weight: 600;
+  color: var(--accent-soft);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.birthday-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.birthday-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.birthday-value {
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .tab-panel {
@@ -207,6 +254,7 @@ main {
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -415,10 +463,12 @@ button.small {
     transform: scale(0.6);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 1;
   }
+
   100% {
     transform: scale(1.6);
     opacity: 0;
@@ -440,6 +490,7 @@ button.small {
   0% {
     transform: translateY(0) scale(0.8);
   }
+
   100% {
     transform: translateY(120vh) scale(1.2);
   }

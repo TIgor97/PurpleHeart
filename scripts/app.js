@@ -147,18 +147,17 @@ const renderOpenWhen = () => {
 
 const startLoveCounter = () => {
   const startDate = new Date("2024-08-02T00:00:00");
-  const yearsEl = document.getElementById("love-years");
-  const daysEl = document.getElementById("love-days");
-  const hoursEl = document.getElementById("love-hours");
-  const minsEl = document.getElementById("love-mins");
-  const secsEl = document.getElementById("love-secs");
-  if (!yearsEl) return;
+  const primary = document.getElementById("love-primary");
+  const secondary = document.getElementById("love-secondary");
+  if (!primary || !secondary) return;
 
   const update = () => {
     const now = new Date();
     let diff = Math.max(0, now - startDate);
-    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-    diff -= years * 1000 * 60 * 60 * 24 * 365;
+    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+    diff -= years * 1000 * 60 * 60 * 24 * 365.25;
+    const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30.44));
+    diff -= months * 1000 * 60 * 60 * 24 * 30.44;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     diff -= days * 1000 * 60 * 60 * 24;
     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -166,11 +165,11 @@ const startLoveCounter = () => {
     const mins = Math.floor(diff / (1000 * 60));
     diff -= mins * 1000 * 60;
     const secs = Math.floor(diff / 1000);
-    yearsEl.textContent = years;
-    daysEl.textContent = days;
-    hoursEl.textContent = hours;
-    minsEl.textContent = mins;
-    secsEl.textContent = secs;
+    primary.textContent = `${years}y : ${months}m : ${days}d`;
+    secondary.textContent = `${String(hours).padStart(2, "0")}h : ${String(mins).padStart(
+      2,
+      "0"
+    )}m : ${String(secs).padStart(2, "0")}s`;
   };
 
   update();
@@ -211,10 +210,7 @@ const renderBubbles = () => {
   const container = document.getElementById("bubble-container");
   if (!container) return;
   container.innerHTML = "";
-  const bubbleData = state.activeUser
-    ? state.userBubbles
-    : state.floatingMessages.map((msg) => ({ type: "text", content: msg }));
-  bubbleData.slice(0, 6).forEach((bubbleItem) => {
+  state.userBubbles.slice(0, 6).forEach((bubbleItem) => {
     const bubble = document.createElement("div");
     bubble.className = "bubble";
     if (bubbleItem.type === "image") {
@@ -253,9 +249,7 @@ const renderMemoryPreview = () => {
 const showFloatingMessage = () => {
   const bubble = document.getElementById("floating-message");
   if (!bubble) return;
-  const pool = state.activeUser
-    ? state.userBubbles
-    : state.floatingMessages.map((msg) => ({ type: "text", content: msg }));
+  const pool = state.userBubbles;
   if (!pool.length) return;
   const pick = pool[Math.floor(Math.random() * pool.length)];
   bubble.innerHTML = "";
@@ -277,6 +271,20 @@ const showFloatingMessage = () => {
 
 const scheduleFloatingMessages = () => {
   setInterval(showFloatingMessage, 12000);
+};
+
+const updateBirthdays = () => {
+  const partner = document.getElementById("birthday-partner");
+  const self = document.getElementById("birthday-self");
+  if (!partner || !self) return;
+  if (!state.activeUser) {
+    partner.textContent = "Sign in to see";
+    self.textContent = "Sign in to see";
+    return;
+  }
+  const profile = APP_CONFIG.userData?.[state.activeUser]?.birthdays;
+  partner.textContent = profile?.partner || "Add in config.js";
+  self.textContent = profile?.self || "Add in config.js";
 };
 
 const renderLove = () => {
@@ -480,6 +488,7 @@ const setupConfigAdmin = () => {
         renderNotes("dreams-list", state.dreams);
         renderNotes("love-messages", state.loveMessages);
         updateAuthUI();
+        updateBirthdays();
       } else if (locked) {
         locked.innerHTML = "<p>Access denied.</p>";
       }
@@ -497,6 +506,7 @@ const setupConfigAdmin = () => {
       state.activeUser = null;
       state.userBubbles = [];
       updateAuthUI();
+      updateBirthdays();
       renderBubbles();
       document.querySelectorAll(".tab").forEach((tab) => {
         tab.classList.remove("active");
@@ -746,6 +756,7 @@ const initApp = () => {
   startLoveCounter();
   renderDailyNote();
   renderBubbles();
+  updateBirthdays();
   renderMemoryPreview();
   renderAudioNotes();
   renderOpenWhen();

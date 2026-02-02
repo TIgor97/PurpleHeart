@@ -58,6 +58,10 @@ const APP_CONFIG = {
   ],
   userData: {
     "cryspyfly@gmail.com": {
+      birthdays: {
+        self: "14 July 1997",
+        partner: "19 September 2003"
+      },
       floatingBubbles: [
         {
           type: "text",
@@ -72,6 +76,10 @@ const APP_CONFIG = {
       ]
     },
     "teodoravuckovic73@gmail.com": {
+      birthdays: {
+        self: "19 September 2003",
+        partner: "14 July 1997"
+      },
       floatingBubbles: [
         {
           type: "text",

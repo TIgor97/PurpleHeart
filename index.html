@@ -17,6 +17,7 @@
 
 <body>
   <div class="hearts-layer" aria-hidden="true"></div>
+  <div class="hearts-layer blur" aria-hidden="true"></div>
   <div class="glow"></div>
 
   <div class="layout">
@@ -60,18 +61,23 @@
       <section id="home" class="tab-panel active">
         <div class="home-focus">
           <div class="love-counter">
-            <p class="love-label">Time together since August 2nd 2024</p>
-            <div class="love-time" id="love-time">
-              <div><span id="love-years">0</span><small>Years</small></div>
-              <div><span id="love-days">0</span><small>Days</small></div>
-              <div><span id="love-hours">0</span><small>Hours</small></div>
-              <div><span id="love-mins">0</span><small>Minutes</small></div>
-              <div><span id="love-secs">0</span><small>Seconds</small></div>
-            </div>
+            <p class="love-label">Time spent together</p>
+            <p class="love-primary" id="love-primary">0y : 0m : 0d</p>
+            <p class="love-secondary" id="love-secondary">00h : 00m : 00s</p>
+            <p class="love-foot">...and forever to go</p>
           </div>
-          <div class="home-actions">
-            <button class="ghost" id="show-love-note">Open a love note</button>
-            <button class="solid" id="add-floating-message">Add new bubble</button>
+          <div class="birthday-card">
+            <p class="birthday-title">Birthdays</p>
+            <div class="birthday-grid">
+              <div>
+                <p class="birthday-label">Your day</p>
+                <p class="birthday-value" id="birthday-partner">Sign in to see</p>
+              </div>
+              <div>
+                <p class="birthday-label">My birthday</p>
+                <p class="birthday-value" id="birthday-self">Sign in to see</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
