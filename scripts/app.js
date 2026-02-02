@@ -19,6 +19,8 @@ const state = {
 };
 
 const storageKey = "purple-heart-state";
+const notificationIcon =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Ctext x='0' y='96' font-size='96'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E";
 
 const getStoredState = () => {
   const stored = localStorage.getItem(storageKey);
@@ -81,7 +83,8 @@ const renderCollages = () => {
   state.collages.forEach((collage) => {
     const card = document.createElement("div");
     card.className = "collage-card";
-    const images = collage.urls.slice(0, 4)
+    const images = collage.urls
+      .slice(0, 4)
       .map((url) => `<img src="${url}" alt="${collage.title}" />`)
       .join("");
     card.innerHTML = `
@@ -178,24 +181,30 @@ const renderNotes = (listId, items) => {
   const list = document.getElementById(listId);
   if (!list) return;
   list.innerHTML = "";
-  items.slice().reverse().forEach((note) => {
-    const card = document.createElement("div");
-    card.className = "note-card";
-    card.innerHTML = `<strong>${note.title || "Note"}</strong><p>${note.body}</p>`;
-    list.appendChild(card);
-  });
+  items
+    .slice()
+    .reverse()
+    .forEach((note) => {
+      const card = document.createElement("div");
+      card.className = "note-card";
+      card.innerHTML = `<strong>${note.title || "Note"}</strong><p>${note.body}</p>`;
+      list.appendChild(card);
+    });
 };
 
 const renderMemoryGallery = (galleryId, items) => {
   const gallery = document.getElementById(galleryId);
   if (!gallery) return;
   gallery.innerHTML = "";
-  items.slice().reverse().forEach((item) => {
-    const card = document.createElement("div");
-    card.className = "memory-item";
-    card.innerHTML = `<img src="${item.url}" alt="${item.caption || "memory"}" /><p>${item.caption || ""}</p>`;
-    gallery.appendChild(card);
-  });
+  items
+    .slice()
+    .reverse()
+    .forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "memory-item";
+      card.innerHTML = `<img src="${item.url}" alt="${item.caption || "memory"}" /><p>${item.caption || ""}</p>`;
+      gallery.appendChild(card);
+    });
 };
 
 const renderBubbles = () => {
@@ -450,8 +459,7 @@ const setupConfigAdmin = () => {
   const signOut = document.getElementById("sign-out");
   if (!APP_CONFIG.googleClientId || APP_CONFIG.googleClientId.includes("PASTE")) {
     if (locked) {
-      locked.innerHTML =
-        "<p>Add your Google Client ID in config.js to enable login.</p>";
+      locked.innerHTML = "<p>Add your Google Client ID in config.js to enable login.</p>";
     }
     return;
   }
@@ -493,32 +501,16 @@ const setupConfigAdmin = () => {
       document.querySelectorAll(".tab").forEach((tab) => {
         tab.classList.remove("active");
       });
-      document.querySelector(".tab[data-tab='home']").classList.add("active");
+      const homeTab = document.querySelector(".tab[data-tab='home']");
+      if (homeTab) homeTab.classList.add("active");
       document.querySelectorAll(".tab-panel").forEach((panel) => {
         panel.classList.remove("active");
       });
-      document.getElementById("home").classList.add("active");
+      const home = document.getElementById("home");
+      if (home) home.classList.add("active");
     });
   }
   updateAuthUI();
-};
-
-const initSpotify = () => {
-  const pill = document.getElementById("spotify-pill");
-  const player = document.getElementById("spotify-player");
-  const toggle = document.getElementById("toggle-player");
-  const volume = document.getElementById("volume-slider");
-
-  toggle.addEventListener("click", () => {
-    const isOpen = player.style.display === "block";
-    player.style.display = isOpen ? "none" : "block";
-    toggle.textContent = isOpen ? "Open player" : "Hide player";
-  });
-
-  volume.addEventListener("input", () => {
-    const value = volume.value;
-    pill.style.boxShadow = `0 0 16px rgba(157, 78, 221, ${value / 200})`;
-  });
 };
 
 const initLoveNote = () => {
@@ -555,6 +547,43 @@ const initAddFloatingMessage = () => {
       renderBubbles();
     }
   });
+};
+
+const initNotifications = () => {
+  const form = document.getElementById("notification-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!state.activeUser) {
+      alert("Sign in to send notifications.");
+      return;
+    }
+    const data = new FormData(form);
+    const title = data.get("title");
+    const body = data.get("body");
+
+    if (Notification.permission === "default") {
+      await Notification.requestPermission();
+    }
+
+    if (Notification.permission === "granted") {
+      new Notification(title, {
+        body,
+        icon: notificationIcon
+      });
+    } else {
+      alert("Notifications blocked. Allow them in your browser settings.");
+    }
+
+    form.reset();
+  });
+};
+
+const initServiceWorker = () => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => null);
+  }
 };
 
 const initForms = () => {
@@ -599,14 +628,22 @@ const initForms = () => {
   });
 
   bindForm("collage-form", (data) => {
-    const urls = data.get("urls").split("\n").map((url) => url.trim()).filter(Boolean);
+    const urls = data
+      .get("urls")
+      .split("\n")
+      .map((url) => url.trim())
+      .filter(Boolean);
     state.collages.unshift({ title: data.get("title"), urls });
     saveState();
     renderCollages();
   });
 
   bindForm("slideshow-form", (data) => {
-    const urls = data.get("urls").split("\n").map((url) => url.trim()).filter(Boolean);
+    const urls = data
+      .get("urls")
+      .split("\n")
+      .map((url) => url.trim())
+      .filter(Boolean);
     state.slideshows.unshift({ title: data.get("title"), urls });
     saveState();
     renderSlideshows();
@@ -671,7 +708,10 @@ const initForms = () => {
 };
 
 const renderAdminLists = () => {
-  renderNotes("floating-list", state.floatingMessages.map((msg) => ({ title: "", body: msg })));
+  renderNotes(
+    "floating-list",
+    state.floatingMessages.map((msg) => ({ title: "", body: msg }))
+  );
   renderNotes("daily-list", state.dailyNotes.map((note) => ({ title: "", body: note })));
   renderMemoryGallery("admin-memories", state.memoryImages);
 };
@@ -728,6 +768,8 @@ const initApp = () => {
   initAudioRecorder();
   initSlideshows();
   initMusicPlayer();
+  initNotifications();
+  initServiceWorker();
   setupConfigAdmin();
 };
 

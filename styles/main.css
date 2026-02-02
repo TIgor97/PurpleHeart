@@ -55,11 +55,9 @@ h4 {
   0% {
     transform: translateY(0) translateX(0);
   }
-
   50% {
     transform: translateY(-120px) translateX(40px);
   }
-
   100% {
     transform: translateY(-240px) translateX(-20px);
   }
@@ -80,7 +78,7 @@ h4 {
   background: rgba(20, 5, 32, 0.9);
   border-right: 1px solid var(--border);
   display: grid;
-  gap: 2rem;
+  gap: 1.4rem;
   z-index: 5;
 }
 
@@ -153,13 +151,11 @@ main {
 }
 
 @keyframes breathe {
-
   0%,
   100% {
     box-shadow: 0 0 30px rgba(157, 78, 221, 0.25);
     transform: scale(1);
   }
-
   50% {
     box-shadow: 0 0 60px rgba(157, 78, 221, 0.55);
     transform: scale(1.02);
@@ -211,7 +207,6 @@ main {
     opacity: 0;
     transform: translateY(16px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -283,162 +278,6 @@ button.small {
   font-size: 0.8rem;
 }
 
-.counter-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-}
-
-.counters {
-  display: grid;
-  gap: 1rem;
-  margin: 1.2rem 0;
-}
-
-.counter {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(62, 15, 90, 0.55);
-  border-radius: 1rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid transparent;
-}
-
-.counter span {
-  font-weight: 600;
-}
-
-.home-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-}
-
-.timeline {
-  background: rgba(41, 10, 63, 0.7);
-  border: 1px solid var(--border);
-  border-radius: 1.4rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  overflow: hidden;
-}
-
-.timeline-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.timeline-track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(220px, 1fr);
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 0.5rem;
-}
-
-.timeline-card {
-  scroll-snap-align: start;
-  background: rgba(52, 12, 78, 0.8);
-  border-radius: 1rem;
-  border: 1px solid var(--border);
-  padding: 1rem;
-}
-
-.timeline-card span {
-  color: var(--accent-soft);
-  font-size: 0.85rem;
-}
-
-.audio-list {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.audio-card {
-  background: rgba(40, 10, 60, 0.75);
-  border-radius: 1rem;
-  padding: 0.8rem;
-  border: 1px solid var(--border);
-  display: grid;
-  gap: 0.6rem;
-}
-
-.audio-recorder {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.8rem;
-}
-
-.audio-recorder span {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-.collage-gallery,
-.slideshow-gallery {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.collage-card,
-.slideshow-card {
-  background: rgba(40, 10, 60, 0.75);
-  border-radius: 1rem;
-  padding: 0.8rem;
-  border: 1px solid var(--border);
-  display: grid;
-  gap: 0.6rem;
-}
-
-.collage-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.4rem;
-}
-
-.collage-grid img,
-.slideshow-card img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 0.6rem;
-}
-
-.slideshow-card img {
-  height: 180px;
-}
-
-.panel {
-  background: var(--card);
-  border-radius: 1.2rem;
-  padding: 1.4rem;
-  border: 1px solid var(--border);
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
-}
-
-.panel h3 {
-  margin-bottom: 0.8rem;
-}
-
-.section-header {
-  margin-bottom: 1.5rem;
-}
-
-.section-header p {
-  color: var(--muted);
-}
-
 .note-layout,
 .memory-layout,
 .love-layout {
@@ -457,7 +296,8 @@ button.small {
 }
 
 .note-form input,
-.note-form textarea {
+.note-form textarea,
+.note-form select {
   background: rgba(20, 5, 32, 0.85);
   color: var(--text);
   border: 1px solid var(--border);
@@ -478,28 +318,39 @@ button.small {
   border: 1px solid var(--border);
 }
 
-.memory-gallery {
+.memory-gallery,
+.collage-gallery,
+.slideshow-gallery {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-.memory-item {
+.memory-item,
+.collage-card,
+.slideshow-card {
   background: rgba(40, 10, 60, 0.75);
   border-radius: 1rem;
   overflow: hidden;
   border: 1px solid var(--border);
-}
-
-.memory-item img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-}
-
-.memory-item p {
   padding: 0.8rem;
-  color: var(--muted);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.memory-item img,
+.collage-grid img,
+.slideshow-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 0.6rem;
+}
+
+.collage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.4rem;
 }
 
 .bubble-container {
@@ -564,12 +415,10 @@ button.small {
     transform: scale(0.6);
     opacity: 0;
   }
-
   50% {
     transform: scale(1.2);
     opacity: 1;
   }
-
   100% {
     transform: scale(1.6);
     opacity: 0;
@@ -591,37 +440,8 @@ button.small {
   0% {
     transform: translateY(0) scale(0.8);
   }
-
   100% {
     transform: translateY(120vh) scale(1.2);
-  }
-}
-
-.love-heart {
-  background: var(--card);
-  border-radius: 1.5rem;
-  padding: 2rem;
-  text-align: center;
-  display: grid;
-  gap: 1rem;
-  justify-items: center;
-  border: 1px solid var(--border);
-}
-
-.love-heart span {
-  font-size: 4rem;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
   }
 }
 
@@ -660,6 +480,7 @@ button.small {
 .music-controls {
   display: flex;
   gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .music-title {
@@ -686,14 +507,41 @@ button.small {
   color: var(--accent-soft);
 }
 
+.notification-button {
+  width: 100%;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
   }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+    padding: 1.2rem;
+  }
+
+  main {
+    padding: 2rem 6vw 4rem;
+  }
 }
 
-@media (max-width: 600px) {
-  .hero {
-    grid-template-columns: 1fr;
+@media (max-width: 640px) {
+  .nav-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-focus {
+    min-height: auto;
+  }
+
+  .love-time {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .floating-message {
+    left: 1rem;
+    right: 1rem;
   }
 }
