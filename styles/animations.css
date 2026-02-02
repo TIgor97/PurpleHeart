@@ -1,0 +1,118 @@
+.glow {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 80% 10%, rgba(157, 78, 221, 0.35), transparent 45%),
+    radial-gradient(circle at 20% 70%, rgba(123, 44, 191, 0.25), transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hearts-layer {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='0' y='50' font-size='28' fill='%239d4edd' fill-opacity='0.12'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E");
+  background-size: 120px;
+  animation: floatHearts 26s linear infinite;
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.hearts-layer.blur {
+  filter: blur(9px);
+  opacity: 0.45;
+  transform: scale(1.08);
+}
+
+.hearts-layer.near {
+  background-size: 90px;
+  opacity: 0.85;
+  animation-duration: 18s;
+}
+
+@keyframes floatHearts {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-120px) translateX(40px);
+  }
+  100% {
+    transform: translateY(-240px) translateX(-20px);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(157, 78, 221, 0.25);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(157, 78, 221, 0.55);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popHeart {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) scale(0.8);
+  }
+  100% {
+    transform: translateY(120vh) scale(1.2);
+  }
+}
+
+.tab-heart-pop {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.tab-heart-pop::after {
+  content: "💜";
+  position: absolute;
+  font-size: 1.2rem;
+  animation: tabHeartPop 0.9s ease forwards;
+}
+
+@keyframes tabHeartPop {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(1.6);
+    opacity: 0;
+  }
+}

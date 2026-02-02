@@ -19,6 +19,7 @@ const state = {
 };
 
 const storageKey = "purple-heart-state";
+const EXPIRY_MS = 24 * 60 * 60 * 1000;
 const notificationIcon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Ctext x='0' y='96' font-size='96'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E";
 
@@ -45,18 +46,26 @@ const applyStoredState = () => {
 
 const getUserStorageKey = (email) => `purple-heart-${email}`;
 
+const normalizeExpiringList = (items) => {
+  if (!Array.isArray(items)) return [];
+  const now = Date.now();
+  return items
+    .map((item) => ({ ...item, createdAt: item.createdAt ?? now }))
+    .filter((item) => now - item.createdAt < EXPIRY_MS);
+};
+
 const loadUserState = (email) => {
   if (!email) return;
   const stored = localStorage.getItem(getUserStorageKey(email));
   if (stored) {
     try {
       const data = JSON.parse(stored);
-      state.userBubbles = data.userBubbles || [];
+      state.userBubbles = normalizeExpiringList(data.userBubbles);
       state.vaultNotes = data.vaultNotes || state.vaultNotes;
-      state.notes = data.notes || state.notes;
-      state.wishes = data.wishes || state.wishes;
-      state.dreams = data.dreams || state.dreams;
-      state.loveMessages = data.loveMessages || state.loveMessages;
+      state.notes = normalizeExpiringList(data.notes);
+      state.wishes = normalizeExpiringList(data.wishes);
+      state.dreams = normalizeExpiringList(data.dreams);
+      state.loveMessages = normalizeExpiringList(data.loveMessages);
     } catch (error) {
       state.userBubbles = [];
     }
@@ -180,7 +189,7 @@ const renderNotes = (listId, items) => {
   const list = document.getElementById(listId);
   if (!list) return;
   list.innerHTML = "";
-  items
+  normalizeExpiringList(items)
     .slice()
     .reverse()
     .forEach((note) => {
@@ -210,7 +219,7 @@ const renderBubbles = () => {
   const container = document.getElementById("bubble-container");
   if (!container) return;
   container.innerHTML = "";
-  state.userBubbles.slice(0, 6).forEach((bubbleItem) => {
+  normalizeExpiringList(state.userBubbles).slice(0, 6).forEach((bubbleItem) => {
     const bubble = document.createElement("div");
     bubble.className = "bubble";
     if (bubbleItem.type === "image") {
@@ -225,12 +234,13 @@ const renderBubbles = () => {
 const renderDailyNote = () => {
   const note = document.getElementById("daily-note");
   if (!note) return;
-  if (state.dailyNotes.length === 0) {
-    note.textContent = "Add a daily note in Config.";
+  const freshNotes = normalizeExpiringList(state.dailyNotes);
+  if (freshNotes.length === 0) {
+    note.textContent = "Add a daily note to make it appear.";
     return;
   }
-  const index = Math.floor(Math.random() * state.dailyNotes.length);
-  note.textContent = state.dailyNotes[index];
+  const index = Math.floor(Math.random() * freshNotes.length);
+  note.textContent = freshNotes[index].body || freshNotes[index];
 };
 
 const renderMemoryPreview = () => {
@@ -249,7 +259,7 @@ const renderMemoryPreview = () => {
 const showFloatingMessage = () => {
   const bubble = document.getElementById("floating-message");
   if (!bubble) return;
-  const pool = state.userBubbles;
+  const pool = normalizeExpiringList(state.userBubbles);
   if (!pool.length) return;
   const pick = pool[Math.floor(Math.random() * pool.length)];
   bubble.innerHTML = "";
@@ -276,15 +286,100 @@ const scheduleFloatingMessages = () => {
 const updateBirthdays = () => {
   const partner = document.getElementById("birthday-partner");
   const self = document.getElementById("birthday-self");
+  const card = document.getElementById("birthday-card");
   if (!partner || !self) return;
   if (!state.activeUser) {
+    if (card) card.style.display = "none";
     partner.textContent = "Sign in to see";
     self.textContent = "Sign in to see";
     return;
   }
+  if (card) card.style.display = "grid";
   const profile = APP_CONFIG.userData?.[state.activeUser]?.birthdays;
   partner.textContent = profile?.partner || "Add in config.js";
   self.textContent = profile?.self || "Add in config.js";
+};
+
+const initYouTubePlaylist = () => {
+  const container = document.getElementById("music-embed");
+  const list = document.getElementById("music-list");
+  const title = document.getElementById("music-title");
+  const form = document.getElementById("music-form");
+  if (!container || !list || !title) return;
+  if (!state.musicTracks || !state.musicTracks.length) {
+    state.musicTracks = [];
+  }
+
+  let current = 0;
+  const toEmbedUrl = (url) => {
+    if (!url) return "";
+    const short = url.match(/youtu\.be\/([\w-]+)/);
+    const long = url.match(/v=([\w-]+)/);
+    const id = short?.[1] || long?.[1];
+    return id ? `https://www.youtube.com/embed/${id}` : "";
+  };
+
+  const renderEmbed = () => {
+    if (!state.musicTracks.length) {
+      container.innerHTML = "";
+      title.textContent = "Add YouTube links below";
+      return;
+    }
+    const track = state.musicTracks[current];
+    const embedUrl = toEmbedUrl(track.url);
+    container.innerHTML = embedUrl
+      ? `<iframe src="${embedUrl}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+      : "";
+    title.textContent = track.title || "YouTube track";
+  };
+
+  const renderList = () => {
+    list.innerHTML = "";
+    state.musicTracks.forEach((track, index) => {
+      const item = document.createElement("div");
+      item.className = "music-item";
+      item.innerHTML = `
+        <span>${track.title || "Untitled"}</span>
+        <div>
+          <button type="button" data-action="play">Play</button>
+          <button type="button" data-action="remove">Remove</button>
+        </div>
+      `;
+      item.querySelector("button[data-action='play']").addEventListener("click", () => {
+        current = index;
+        renderEmbed();
+      });
+      item.querySelector("button[data-action='remove']").addEventListener("click", () => {
+        state.musicTracks.splice(index, 1);
+        saveState();
+        if (current >= state.musicTracks.length) {
+          current = Math.max(0, state.musicTracks.length - 1);
+        }
+        renderList();
+        renderEmbed();
+      });
+      list.appendChild(item);
+    });
+  };
+
+  if (form) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const url = String(data.get("url") || "").trim();
+      const titleText = String(data.get("title") || "").trim();
+      if (!url) return;
+      state.musicTracks.push({ title: titleText || "YouTube track", url });
+      saveState();
+      current = state.musicTracks.length - 1;
+      renderList();
+      renderEmbed();
+      form.reset();
+    });
+  }
+
+  renderList();
+  renderEmbed();
 };
 
 const renderLove = () => {
@@ -315,6 +410,19 @@ const initTabs = () => {
         alert("Please sign in to access this tab.");
         return;
       }
+      if (!tab.classList.contains("active")) {
+        const rect = tab.getBoundingClientRect();
+        for (let i = 0; i < 5; i += 1) {
+          const pop = document.createElement("div");
+          pop.className = "tab-heart-pop";
+          pop.style.left = `${rect.left + rect.width / 2}px`;
+          pop.style.top = `${rect.top + rect.height / 2}px`;
+          pop.style.setProperty("--x", `${(Math.random() - 0.5) * 80}px`);
+          pop.style.setProperty("--y", `${(Math.random() - 0.5) * 80}px`);
+          document.body.appendChild(pop);
+          setTimeout(() => pop.remove(), 900);
+        }
+      }
       tabs.forEach((t) => t.classList.remove("active"));
       panels.forEach((panel) => panel.classList.remove("active"));
       tab.classList.add("active");
@@ -325,14 +433,25 @@ const initTabs = () => {
 
 const updateAuthUI = () => {
   const status = document.getElementById("auth-status");
+  const statusDetail = document.getElementById("auth-status-detail");
   const signOut = document.getElementById("sign-out");
   const adminPanel = document.getElementById("admin-panel");
   const adminLocked = document.getElementById("admin-locked");
+  const sidebarLogin = document.getElementById("sidebar-login");
+  const sidebarContent = document.getElementById("sidebar-content");
+
   if (status) {
     status.textContent = state.activeUser ? `Signed in as ${state.activeUser}` : "Not signed in";
   }
+  if (statusDetail) {
+    statusDetail.textContent = state.activeUser ? "Signed in" : "Waiting for login";
+  }
   if (signOut) {
     signOut.style.display = state.activeUser ? "inline-flex" : "none";
+  }
+  if (sidebarLogin && sidebarContent) {
+    sidebarLogin.classList.toggle("hidden", !!state.activeUser);
+    sidebarContent.classList.toggle("hidden", !state.activeUser);
   }
   if (adminPanel && adminLocked) {
     if (state.activeUser) {
@@ -343,6 +462,9 @@ const updateAuthUI = () => {
       adminLocked.classList.remove("hidden");
     }
   }
+  document.querySelectorAll(".tab[data-auth='true']").forEach((tab) => {
+    tab.classList.toggle("locked", !state.activeUser);
+  });
 };
 
 const initAudioRecorder = () => {
@@ -601,7 +723,8 @@ const initForms = () => {
     if (!state.activeUser) return;
     state.notes.push({
       title: data.get("title"),
-      body: data.get("body")
+      body: data.get("body"),
+      createdAt: Date.now()
     });
     saveUserState();
     renderNotes("notes-list", state.notes);
@@ -611,7 +734,8 @@ const initForms = () => {
     if (!state.activeUser) return;
     state.wishes.push({
       title: data.get("title"),
-      body: data.get("body")
+      body: data.get("body"),
+      createdAt: Date.now()
     });
     saveUserState();
     renderNotes("wishes-list", state.wishes);
@@ -621,7 +745,8 @@ const initForms = () => {
     if (!state.activeUser) return;
     state.dreams.push({
       title: data.get("title"),
-      body: data.get("body")
+      body: data.get("body"),
+      createdAt: Date.now()
     });
     saveUserState();
     renderNotes("dreams-list", state.dreams);
@@ -661,7 +786,11 @@ const initForms = () => {
 
   bindForm("love-form", (data) => {
     if (!state.activeUser) return;
-    state.loveMessages.push({ title: "Love", body: data.get("body") });
+    state.loveMessages.push({
+      title: "Love",
+      body: data.get("body"),
+      createdAt: Date.now()
+    });
     saveUserState();
     renderLove();
   });
@@ -689,10 +818,11 @@ const initForms = () => {
     if (!state.activeUser) return;
     const image = data.get("image");
     const message = data.get("message");
+    const createdAt = Date.now();
     if (image) {
-      state.userBubbles.unshift({ type: "image", content: image });
+      state.userBubbles.unshift({ type: "image", content: image, createdAt });
     } else {
-      state.userBubbles.unshift({ type: "text", content: message });
+      state.userBubbles.unshift({ type: "text", content: message, createdAt });
     }
     saveUserState();
     renderBubbles();
@@ -700,7 +830,7 @@ const initForms = () => {
   });
 
   bindForm("daily-form", (data) => {
-    state.dailyNotes.push(data.get("note"));
+    state.dailyNotes.push({ body: data.get("note"), createdAt: Date.now() });
     saveState();
     renderDailyNote();
     renderAdminLists();
@@ -778,7 +908,7 @@ const initApp = () => {
   initLoveNote();
   initAudioRecorder();
   initSlideshows();
-  initMusicPlayer();
+  initYouTubePlaylist();
   initNotifications();
   initServiceWorker();
   setupConfigAdmin();

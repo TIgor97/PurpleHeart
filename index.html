@@ -18,6 +18,7 @@
 <body>
   <div class="hearts-layer" aria-hidden="true"></div>
   <div class="hearts-layer blur" aria-hidden="true"></div>
+  <div class="hearts-layer near" aria-hidden="true"></div>
   <div class="glow"></div>
 
   <div class="layout">
@@ -29,31 +30,38 @@
           <p class="brand-sub">1.5 years of us and forever to go</p>
         </div>
       </div>
-      <nav class="nav-tabs">
-        <button class="tab active" data-tab="home">Home</button>
-        <button class="tab" data-tab="notes" data-auth="true">Notes</button>
-        <button class="tab" data-tab="memories" data-auth="true">Memories</button>
-        <button class="tab" data-tab="wishes" data-auth="true">Wishes</button>
-        <button class="tab" data-tab="dreams" data-auth="true">Dreams</button>
-        <button class="tab" data-tab="love" data-auth="true">Our Love</button>
-        <button class="tab" data-tab="vault" data-auth="true">Vault</button>
-        <button class="tab" data-tab="admin" data-auth="true">Config</button>
-      </nav>
-      <div class="auth-panel" id="auth-panel">
+      <div class="sidebar-login" id="sidebar-login">
         <p class="auth-title">Private access</p>
         <div id="gsi-button"></div>
         <p class="auth-status" id="auth-status">Not signed in</p>
-        <button class="ghost small" id="sign-out" type="button">Sign out</button>
       </div>
-      <div class="music-player" id="music-player">
-        <p class="music-label">Our playlist</p>
-        <audio id="audio-player" preload="auto"></audio>
-        <div class="music-controls">
-          <button class="ghost small" id="prev-track">Prev</button>
-          <button class="solid small" id="play-track">Play</button>
-          <button class="ghost small" id="next-track">Next</button>
+      <div class="sidebar-content" id="sidebar-content">
+        <nav class="nav-tabs">
+          <button class="tab active" data-tab="home">Home</button>
+          <button class="tab" data-tab="notes" data-auth="true">Notes</button>
+          <button class="tab" data-tab="memories" data-auth="true">Memories</button>
+          <button class="tab" data-tab="wishes" data-auth="true">Wishes</button>
+          <button class="tab" data-tab="dreams" data-auth="true">Dreams</button>
+          <button class="tab" data-tab="love" data-auth="true">Our Love</button>
+          <button class="tab" data-tab="vault" data-auth="true">Vault</button>
+          <button class="tab" data-tab="admin" data-auth="true">Config</button>
+        </nav>
+        <div class="auth-panel" id="auth-panel">
+          <p class="auth-title">Signed in</p>
+          <p class="auth-status" id="auth-status-detail">Ready</p>
+          <button class="ghost small" id="sign-out" type="button">Sign out</button>
         </div>
-        <p class="music-title" id="music-title">Add tracks in config.js</p>
+        <div class="music-player" id="music-player">
+          <p class="music-label">Our playlist</p>
+          <form class="music-form" id="music-form">
+            <input type="text" name="title" placeholder="Song title" />
+            <input type="url" name="url" placeholder="YouTube link" required />
+            <button class="solid small" type="submit">Add</button>
+          </form>
+          <div class="music-embed" id="music-embed"></div>
+          <div class="music-list" id="music-list"></div>
+          <p class="music-title" id="music-title">Add YouTube links in config.js</p>
+        </div>
       </div>
     </aside>
 
@@ -66,7 +74,7 @@
             <p class="love-secondary" id="love-secondary">00h : 00m : 00s</p>
             <p class="love-foot">...and forever to go</p>
           </div>
-          <div class="birthday-card">
+          <div class="birthday-card" id="birthday-card">
             <p class="birthday-title">Birthdays</p>
             <div class="birthday-grid">
               <div>

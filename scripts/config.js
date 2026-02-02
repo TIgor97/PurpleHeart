@@ -13,17 +13,8 @@ const APP_CONFIG = {
       color: "var(--accent-soft)"
     }
   ],
-  floatingMessages: [
-    "You are my favorite person.",
-    "Forever starts with today.",
-    "Thank you for choosing us.",
-    "Love looks good on us.",
-    "You + me = always."
-  ],
-  dailyNotes: [
-    "Open this when you miss me: I love you endlessly.",
-    "Today I want to remind you how proud I am of you."
-  ],
+  floatingMessages: [],
+  dailyNotes: [],
   memoryImages: [
     {
       url: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
@@ -62,12 +53,7 @@ const APP_CONFIG = {
         self: "14 July 1997",
         partner: "19 September 2003"
       },
-      floatingBubbles: [
-        {
-          type: "text",
-          content: "A private note just for you."
-        }
-      ],
+      floatingBubbles: [],
       privateNotes: [
         {
           title: "For her",
@@ -80,16 +66,11 @@ const APP_CONFIG = {
         self: "19 September 2003",
         partner: "14 July 1997"
       },
-      floatingBubbles: [
-        {
-          type: "text",
-          content: "A private note just for you."
-        }
-      ],
+      floatingBubbles: [],
       privateNotes: [
         {
           title: "For him",
-          body: "Write something only he can read when he signs in."
+          body: "Write something only he can read when she signs in."
         }
       ]
     }
@@ -102,10 +83,7 @@ const APP_CONFIG = {
       body: "Reserved for just us."
     }
   ],
-  loveMessages: [
-    "Every beat says your name.",
-    "Our love keeps growing."
-  ],
+  loveMessages: [],
   musicTracks: [
     {
       title: "Add your song title",
