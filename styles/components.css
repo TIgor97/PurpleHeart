@@ -572,6 +572,10 @@ button.small {
   display: none;
 }
 
+
+
+
+
 .travel-grid {
   display: grid;
   grid-template-columns: 1fr 300px;  
@@ -584,17 +588,22 @@ button.small {
     border: 1px solid var(--border);
     border-radius: 1.5rem;
     position: relative;
-    height: 450px; 
+  height: 500px !important; /* Forsiramo visinu */
+    min-height: 500px;
     width: 100%;
     overflow: hidden;  
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: grab;  
+    cursor: grab;  touch-action: none;
 }
 
 .map-box:active {
     cursor: grabbing;
+}
+
+.map-box.is-panning #world-map-svg svg {
+    transition: none !important;
 }
 
 .country-sidebar {
@@ -627,18 +636,18 @@ button.small {
   }
 }
   
-#world-map-svg path {
-    fill: rgba(157, 78, 221, 0.15);  
-    stroke: var(--border);
-    stroke-width: 0.5;
-    transition: fill 0.3s ease;
+#world-map-svg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #world-map-svg svg {
-    width: 100%; 
-    height: 100%;
-    transition: transform 0.1s ease-out;  
-    transform-origin: center;  
+    width: 100% !important;
+    height: 100% !important; 
+    object-fit: contain; 
 }
  
 #world-map-svg path:hover {
@@ -651,8 +660,53 @@ button.small {
     filter: drop-shadow(0 0 5px var(--glow));
 }
 
-.travel-stats-container {
-    margin-top: 10px;
-    width: 100%;
-    max-width: 400px;
+.country-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+}
+
+.country-item:hover {
+    background: rgba(157, 78, 221, 0.1);
+}
+
+.country-item.visited {
+    background: rgba(157, 78, 221, 0.2);
+}
+
+.country-item .flag {
+    margin-right: 15px;
+    font-size: 1.4rem;
+}
+
+.country-item .name {
+    flex-grow: 1;
+    color: var(--text);
+}
+
+.country-item .heart {
+    font-size: 0.8rem;
+}
+.progress-bar-bg {
+    margin-top: 15px;
+    display: block !important;
+    min-width: 200px;
+}
+
+.progress-bar-bg {
+    height: 8px;
+    background: var(--bg-soft);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--glow);
+    transition: width 0.5s ease;
 }
