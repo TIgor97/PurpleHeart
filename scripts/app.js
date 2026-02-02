@@ -1147,6 +1147,7 @@ const initApp = () => {
   initYouTubePlaylist();
   initNotifications();
   initServiceWorker();
+    loadMap(); 
   const firebaseBundle = initFirebase();
   const db = firebaseBundle?.db || null;
   firebaseDb = db;
@@ -1225,7 +1226,6 @@ const initApp = () => {
   }
 };
 
-document.addEventListener("DOMContentLoaded", initApp);
  
 const loadMap = async () => {
     try {
@@ -1251,7 +1251,7 @@ const colorVisitedCountries = () => {
         }
     });
 };
- 
-document.addEventListener('DOMContentLoaded', () => {
-    loadMap(); 
-});
+  
+
+
+document.addEventListener("DOMContentLoaded", initApp);
