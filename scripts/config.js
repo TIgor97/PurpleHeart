@@ -56,6 +56,9 @@ const APP_CONFIG = {
       openDate: "2026-02-02"
     }
   ],
+  visitedCountries: [
+    { id: "RS", date: "2024-08-02", note: "Where it all started 💜" }
+  ],
   userData: {
     "cryspyfly@gmail.com": {
       birthdays: {

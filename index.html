@@ -208,16 +208,27 @@
         </div>
       </section>
 
-      <section id="travels" class="tab-panel">
-    <div class="section-header">
-      <h2>Our Travels</h2>
-      <p>Every destination is better when I'm with you.</p>
+     <section id="travels" class="tab-panel">
+  <div class="section-header">
+    <h2>Our Travels</h2>
+    <p id="travel-stats-text">Exploring the world, one purple heart at a time.</p>
+  </div>
+
+  <div class="travel-grid">
+    <div class="map-box">
+      <div id="world-map-svg">
+        </div>
     </div>
-    
-    <div class="travel-content">
-      <p style="color: var(--muted)">Mapa i spisak država stižu uskoro...</p>
+
+    <div class="country-sidebar">
+      <div class="search-wrapper">
+        <input type="text" id="country-search" placeholder="Search countries..." oninput="filterCountries()">
+      </div>
+      <div id="countries-list" class="countries-list">
+        </div>
     </div>
-  </section>
+  </div>
+</section>
 
       <section id="admin" class="tab-panel">
         <div class="section-header">
