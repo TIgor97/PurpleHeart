@@ -1,4 +1,13 @@
 const APP_CONFIG = {
+  firebaseConfig: {
+    apiKey: "AIzaSyDaPylIYSWtCbaY8T3ictCe1_6iaT2rsHg",
+    authDomain: "purpleheart-b5fa6.firebaseapp.com",
+    projectId: "purpleheart-b5fa6",
+    storageBucket: "purpleheart-b5fa6.firebasestorage.app",
+    messagingSenderId: "880836841031",
+    appId: "1:880836841031:web:8a8773a472b313e793ab62",
+    measurementId: "G-2D7QT9DKTT"
+  },
   googleClientId: "845428318291-f8hg78pi6gllp91gpiiqqmgt2kviueqk.apps.googleusercontent.com",
   allowedEmails: ["cryspyfly@gmail.com", "teodoravuckovic73@gmail.com"],
   events: [

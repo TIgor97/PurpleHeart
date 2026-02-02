@@ -91,6 +91,72 @@ const showToast = (message, type = "") => {
   }, 2500);
 };
 
+const getPartnerEmail = (email) => {
+  if (!email) return null;
+  const others = APP_CONFIG.allowedEmails.filter((entry) => entry !== email);
+  return others[0] || null;
+};
+
+const initFirebase = () => {
+  if (!APP_CONFIG.firebaseConfig || !window.firebase) return null;
+  if (!firebase.apps.length) {
+    firebase.initializeApp(APP_CONFIG.firebaseConfig);
+  }
+  return firebase.firestore();
+};
+
+const initAnniversaryPopup = (db) => {
+  const popup = document.getElementById("anniversary-popup");
+  const title = document.getElementById("anniversary-title");
+  const message = document.getElementById("anniversary-message");
+  const image = document.getElementById("anniversary-image");
+  const close = document.getElementById("anniversary-close");
+  if (!popup || !title || !message || !image || !close || !db) return;
+
+  let activeDoc = null;
+
+  close.addEventListener("click", async () => {
+    popup.classList.remove("show");
+    if (activeDoc) {
+      try {
+        await db.collection("anniversaryPosts").doc(activeDoc).update({
+          seen: true,
+          seenAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (error) {
+        showToast("Failed to mark as seen", "error");
+      }
+    }
+    activeDoc = null;
+  });
+
+  const listenForPosts = (email) => {
+    if (!email) return;
+    db.collection("anniversaryPosts")
+      .where("to", "==", email)
+      .where("seen", "==", false)
+      .orderBy("createdAt", "desc")
+      .limit(1)
+      .onSnapshot((snapshot) => {
+        if (snapshot.empty) return;
+        const doc = snapshot.docs[0];
+        const data = doc.data();
+        activeDoc = doc.id;
+        title.textContent = data.title || "Anniversary";
+        message.textContent = data.message || "";
+        if (data.image) {
+          image.src = data.image;
+          image.style.display = "block";
+        } else {
+          image.style.display = "none";
+        }
+        popup.classList.add("show");
+      });
+  };
+
+  return listenForPosts;
+};
+
 const loadUserState = (email) => {
   if (!email) return;
   const stored = localStorage.getItem(getUserStorageKey(email));
@@ -967,6 +1033,45 @@ const initApp = () => {
   initNotifications();
   initServiceWorker();
   setupConfigAdmin();
+  const db = initFirebase();
+  const listenForPosts = initAnniversaryPopup(db);
+  if (listenForPosts && state.activeUser) {
+    listenForPosts(state.activeUser);
+  }
+  const anniversaryForm = document.getElementById("anniversary-form");
+  if (anniversaryForm && db) {
+    anniversaryForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!state.activeUser) {
+        showToast("Sign in to send", "error");
+        return;
+      }
+      const data = new FormData(anniversaryForm);
+      const title = data.get("title");
+      const message = data.get("message");
+      const image = data.get("image");
+      const partner = getPartnerEmail(state.activeUser);
+      if (!partner) {
+        showToast("No partner email found", "error");
+        return;
+      }
+      try {
+        await db.collection("anniversaryPosts").add({
+          title,
+          message,
+          image: image || "",
+          from: state.activeUser,
+          to: partner,
+          seen: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast("Sent to your love 💜", "success");
+        anniversaryForm.reset();
+      } catch (error) {
+        showToast("Failed to send", "error");
+      }
+    });
+  }
 };
 
 document.addEventListener("DOMContentLoaded", initApp);

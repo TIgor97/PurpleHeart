@@ -33,10 +33,8 @@
         </div>
       </div>
       <div class="sidebar-login" id="sidebar-login">
-        <p class="auth-title">Private access</p>
         <div id="gsi-button"></div>
-        <button class="solid small" id="login-button" type="button">Sign in with Google</button>
-        <p class="auth-status" id="auth-status">Not signed in</p>
+        <button class="solid" id="login-button" type="button">Sign in with Google</button>
       </div>
       <div class="sidebar-content hidden" id="sidebar-content">
         <nav class="nav-tabs">
@@ -49,10 +47,8 @@
           <button class="tab" data-tab="vault" data-auth="true">Vault</button>
           <button class="tab" data-tab="admin" data-auth="true">Config</button>
         </nav>
-        <div class="auth-panel" id="auth-panel">
-          <p class="auth-title">Signed in</p>
-          <p class="auth-status" id="auth-status-detail">Ready</p>
-          <button class="ghost small" id="sign-out" type="button">Sign out</button>
+        <div class="sidebar-footer">
+          <button class="ghost" id="sign-out" type="button">Sign out</button>
         </div>
         <div class="music-player" id="music-player">
           <p class="music-label">Our playlist</p>
@@ -254,6 +250,15 @@
               <button class="solid notification-button" type="submit">Send notification</button>
             </form>
           </div>
+          <div class="admin-section">
+            <h3>Anniversary surprise</h3>
+            <form id="anniversary-form" class="note-form">
+              <input type="text" name="title" placeholder="Title" required />
+              <textarea name="message" rows="3" placeholder="Message" required></textarea>
+              <input type="url" name="image" placeholder="Optional image URL" />
+              <button class="solid" type="submit">Send to my love</button>
+            </form>
+          </div>
         </div>
       </section>
     </main>
@@ -261,7 +266,17 @@
 
   <div class="floating-message" id="floating-message"></div>
   <div class="toast-container" id="toast-container"></div>
+  <div class="anniversary-popup" id="anniversary-popup">
+    <div class="anniversary-card">
+      <p class="anniversary-title" id="anniversary-title"></p>
+      <p class="anniversary-message" id="anniversary-message"></p>
+      <img class="anniversary-image" id="anniversary-image" alt="Anniversary" />
+      <button class="ghost" id="anniversary-close" type="button">Close</button>
+    </div>
+  </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="scripts/app.js"></script>
 </body>
 
