@@ -1226,19 +1226,57 @@ const initApp = () => {
   }
 };
 
- 
 const loadMap = async () => {
+
+  
     try {
         const response = await fetch('worldMap.svg');
         const svgData = await response.text();
         document.getElementById('world-map-svg').innerHTML = svgData;
-         
+        
         colorVisitedCountries();
+        setupZoomAndPan(); 
     } catch (err) {
-        console.error("Mapa nije mogla da se učita:", err);
+        console.error("Greška:", err);
     }
 };
+
+
+let zoomLevel = 1;
+let isPanning = false;
+let startX, startY, scrollLeft, scrollTop;
+
+const setupZoomAndPan = () => {
+    const mapContainer = document.querySelector('.map-box');
+    const svgElement = document.querySelector('#world-map-svg svg');
  
+    mapContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 5);  
+        svgElement.style.transform = `scale(${zoomLevel})`;
+    });
+ 
+    mapContainer.onmousedown = (e) => {
+        isPanning = true;
+        startX = e.pageX - svgElement.offsetLeft;
+        startY = e.pageY - svgElement.offsetTop;
+    };
+
+    window.onmouseup = () => {
+        isPanning = false;
+    };
+
+    mapContainer.onmousemove = (e) => {
+        if (!isPanning) return;
+        e.preventDefault();
+        const x = e.pageX - startX;
+        const y = e.pageY - startY; 
+        svgElement.style.marginLeft = `${x}px`;
+        svgElement.style.marginTop = `${y}px`;
+    };
+};
+
 const colorVisitedCountries = () => { 
     document.querySelectorAll('#world-map-svg path').forEach(path => {
         path.classList.remove('visited');
@@ -1250,8 +1288,6 @@ const colorVisitedCountries = () => {
             countryElement.classList.add('visited');
         }
     });
-};
-  
-
+}; 
 
 document.addEventListener("DOMContentLoaded", initApp);

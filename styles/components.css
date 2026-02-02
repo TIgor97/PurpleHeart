@@ -580,14 +580,21 @@ button.small {
 }
 
 .map-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  padding: 1rem;
-  min-height: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    position: relative;
+    height: 450px; 
+    width: 100%;
+    overflow: hidden;  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;  
+}
+
+.map-box:active {
+    cursor: grabbing;
 }
 
 .country-sidebar {
@@ -627,7 +634,13 @@ button.small {
     transition: fill 0.3s ease;
 }
 
-/* Hover efekat */
+#world-map-svg svg {
+    width: 100%; 
+    height: 100%;
+    transition: transform 0.1s ease-out;  
+    transform-origin: center;  
+}
+ 
 #world-map-svg path:hover {
     fill: rgba(157, 78, 221, 0.4);
     cursor: pointer;
