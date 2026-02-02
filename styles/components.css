@@ -458,3 +458,36 @@ button.small {
 .notification-button {
   width: 100%;
 }
+
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 0.6rem;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.toast {
+  background: rgba(24, 4, 36, 0.92);
+  color: var(--text);
+  border: 1px solid rgba(157, 78, 221, 0.5);
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: toastIn 0.3s ease forwards;
+}
+
+.toast.success {
+  border-color: rgba(185, 124, 245, 0.7);
+}
+
+.toast.error {
+  border-color: rgba(255, 122, 183, 0.6);
+}

@@ -33,20 +33,24 @@
   0% {
     transform: translateY(0) translateX(0);
   }
+
   50% {
     transform: translateY(-120px) translateX(40px);
   }
+
   100% {
     transform: translateY(-240px) translateX(-20px);
   }
 }
 
 @keyframes breathe {
+
   0%,
   100% {
     box-shadow: 0 0 30px rgba(157, 78, 221, 0.25);
     transform: scale(1);
   }
+
   50% {
     box-shadow: 0 0 60px rgba(157, 78, 221, 0.55);
     transform: scale(1.02);
@@ -58,6 +62,7 @@
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -69,10 +74,12 @@
     transform: scale(0.6);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 1;
   }
+
   100% {
     transform: scale(1.6);
     opacity: 0;
@@ -83,6 +90,7 @@
   0% {
     transform: translateY(0) scale(0.8);
   }
+
   100% {
     transform: translateY(120vh) scale(1.2);
   }
@@ -108,11 +116,25 @@
     transform: translate(0, 0) scale(0.6);
     opacity: 0;
   }
+
   40% {
     opacity: 1;
   }
+
   100% {
     transform: translate(var(--x), var(--y)) scale(1.6);
     opacity: 0;
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

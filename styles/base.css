@@ -23,6 +23,7 @@ body {
     radial-gradient(circle at 80% 80%, #190028, #0b0014 70%);
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 h1,
@@ -76,6 +77,8 @@ main {
   position: relative;
   z-index: 1;
   padding: 2.5rem 6vw 6rem;
+  max-height: 100vh;
+  overflow-y: auto;
 }
 
 @media (max-width: 900px) {

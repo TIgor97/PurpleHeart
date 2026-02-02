@@ -77,6 +77,20 @@ const normalizeExpiringList = (items) => {
     .filter((item) => now - item.createdAt < EXPIRY_MS);
 };
 
+const showToast = (message, type = "") => {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`.trim();
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+};
+
 const loadUserState = (email) => {
   if (!email) return;
   const stored = localStorage.getItem(getUserStorageKey(email));
@@ -458,6 +472,7 @@ const updateAuthUI = () => {
   const status = document.getElementById("auth-status");
   const statusDetail = document.getElementById("auth-status-detail");
   const signOut = document.getElementById("sign-out");
+  const loginButton = document.getElementById("login-button");
   const adminPanel = document.getElementById("admin-panel");
   const adminLocked = document.getElementById("admin-locked");
   const sidebarLogin = document.getElementById("sidebar-login");
@@ -471,6 +486,9 @@ const updateAuthUI = () => {
   }
   if (signOut) {
     signOut.style.display = state.activeUser ? "inline-flex" : "none";
+  }
+  if (loginButton) {
+    loginButton.style.display = state.activeUser ? "none" : "inline-flex";
   }
   if (sidebarLogin && sidebarContent) {
     sidebarLogin.classList.toggle("hidden", !!state.activeUser);
@@ -610,6 +628,7 @@ const initMusicPlayer = () => {
 const setupConfigAdmin = () => {
   const locked = document.getElementById("admin-locked");
   const signOut = document.getElementById("sign-out");
+  const loginButton = document.getElementById("login-button");
   if (!APP_CONFIG.googleClientId || APP_CONFIG.googleClientId.includes("PASTE")) {
     if (locked) {
       locked.innerHTML = "<p>Add your Google Client ID in config.js to enable login.</p>";
@@ -624,6 +643,7 @@ const setupConfigAdmin = () => {
       if (APP_CONFIG.allowedEmails.includes(payload.email)) {
         state.activeUser = payload.email;
         saveAuthState(payload.email);
+        showToast("Login successful 💜", "success");
         const userConfig = APP_CONFIG.userData?.[payload.email];
         state.userBubbles = userConfig?.floatingBubbles || [];
         loadUserState(payload.email);
@@ -636,6 +656,7 @@ const setupConfigAdmin = () => {
         updateAuthUI();
         updateBirthdays();
       } else if (locked) {
+        showToast("Login failed: access denied", "error");
         locked.innerHTML = "<p>Access denied.</p>";
       }
     }
@@ -647,6 +668,13 @@ const setupConfigAdmin = () => {
     shape: "pill"
   });
 
+  if (loginButton) {
+    loginButton.addEventListener("click", () => {
+      showToast("Opening Google login...", "");
+      google.accounts.id.prompt();
+    });
+  }
+
   if (signOut) {
     signOut.addEventListener("click", () => {
       state.activeUser = null;
@@ -655,6 +683,7 @@ const setupConfigAdmin = () => {
       updateAuthUI();
       updateBirthdays();
       renderBubbles();
+      showToast("Logged out", "");
       document.querySelectorAll(".tab").forEach((tab) => {
         tab.classList.remove("active");
       });
