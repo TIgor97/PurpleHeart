@@ -713,17 +713,22 @@ button.small {
     border: 1px solid var(--border);
     border-radius: 1.5rem;
     position: relative;
-    height: 550px; 
+  height: 500px !important; /* Forsiramo visinu */
+    min-height: 500px;
     width: 100%;
     overflow: hidden;  
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: grab;  
+    cursor: grab;  touch-action: none;
 }
 
 .map-box:active {
     cursor: grabbing;
+}
+
+.map-box.is-panning #world-map-svg svg {
+    transition: none !important;
 }
 
 .country-sidebar {

@@ -1246,44 +1246,51 @@ let isPanning = false;
 let startX, startY;
 let translateX = 0, translateY = 0;
 
+// Funkcija za ažuriranje procenta
+const updateTravelStats = () => {
+    const totalCountries = Object.keys(APP_CONFIG.allCountries).length;
+    const visitedCount = APP_CONFIG.visitedCountries.length;
+    const percentage = ((visitedCount / totalCountries) * 100).toFixed(1);
+    
+    document.getElementById('travel-stats-text').innerText = 
+        `We've explored ${visitedCount} countries together (${percentage}%)!`;
+    document.getElementById('travel-progress-fill').style.width = `${percentage}%`;
+};
+
+// POPRAVLJEN SETUP ZA DRAG & MOVE
 const setupZoomAndPan = () => {
     const mapContainer = document.querySelector('.map-box');
     const svgElement = document.querySelector('#world-map-svg svg');
+    let isDragging = false;
+    let startX, startY;
+    let translateX = 0, translateY = 0;
+    let scale = 1;
 
-    if (!mapContainer || !svgElement) return;
- 
     mapContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.2 : 0.2;
-        zoomLevel = Math.min(Math.max(1, zoomLevel + delta), 6);  
-        
-        applyTransform();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        scale = Math.min(Math.max(1, scale + delta), 8);
+        svgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     }, { passive: false });
- 
+
     mapContainer.addEventListener('mousedown', (e) => {
-        isPanning = true;
-        mapContainer.style.cursor = 'grabbing';
+        isDragging = true;
+        mapContainer.classList.add('is-panning');
         startX = e.clientX - translateX;
         startY = e.clientY - translateY;
     });
 
     window.addEventListener('mousemove', (e) => {
-        if (!isPanning) return;
-        
+        if (!isDragging) return;
         translateX = e.clientX - startX;
         translateY = e.clientY - startY;
-        
-        applyTransform();
+        svgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
     });
 
     window.addEventListener('mouseup', () => {
-        isPanning = false;
-        mapContainer.style.cursor = 'grab';
+        isDragging = false;
+        mapContainer.classList.remove('is-panning');
     });
- 
-    function applyTransform() {
-        svgElement.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomLevel})`;
-    }
 };
 
 const colorVisitedCountries = () => { 
