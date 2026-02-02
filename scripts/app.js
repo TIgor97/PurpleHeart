@@ -1226,3 +1226,32 @@ const initApp = () => {
 };
 
 document.addEventListener("DOMContentLoaded", initApp);
+ 
+const loadMap = async () => {
+    try {
+        const response = await fetch('worldMap.svg');
+        const svgData = await response.text();
+        document.getElementById('world-map-svg').innerHTML = svgData;
+         
+        colorVisitedCountries();
+    } catch (err) {
+        console.error("Mapa nije mogla da se učita:", err);
+    }
+};
+ 
+const colorVisitedCountries = () => { 
+    document.querySelectorAll('#world-map-svg path').forEach(path => {
+        path.classList.remove('visited');
+    });
+ 
+    APP_CONFIG.visitedCountries.forEach(country => {
+        const countryElement = document.getElementById(country.id);
+        if (countryElement) {
+            countryElement.classList.add('visited');
+        }
+    });
+};
+ 
+document.addEventListener('DOMContentLoaded', () => {
+    loadMap(); 
+});
