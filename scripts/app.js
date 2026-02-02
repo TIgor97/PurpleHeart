@@ -1227,26 +1227,39 @@ const initApp = () => {
 };
 
 const loadMap = async () => {
-
-  
     try {
         const response = await fetch('worldMap.svg');
         const svgData = await response.text();
         document.getElementById('world-map-svg').innerHTML = svgData;
-        
-        colorVisitedCountries();
-        setupZoomAndPan(); 
+         
+        renderCountryList();   
+        colorVisitedCountries();  
+        updateTravelStats();    
+        setupZoomAndPan();   
     } catch (err) {
-        console.error("Greška:", err);
+        console.error("Mapa nije učitana:", err);
     }
+};
+
+const filterCountries = () => {
+    const searchTerm = document.getElementById('country-search').value.toLowerCase();
+    const items = document.querySelectorAll('.country-item');
+
+    items.forEach(item => {
+        const countryName = item.querySelector('.name').innerText.toLowerCase();
+        if (countryName.includes(searchTerm)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
 };
 
 let zoomLevel = 1;
 let isPanning = false;
 let startX, startY;
 let translateX = 0, translateY = 0;
-
-// Funkcija za ažuriranje procenta
+  
 const updateTravelStats = () => {
     const totalCountries = Object.keys(APP_CONFIG.allCountries).length;
     const visitedCount = APP_CONFIG.visitedCountries.length;
@@ -1256,8 +1269,7 @@ const updateTravelStats = () => {
         `We've explored ${visitedCount} countries together (${percentage}%)!`;
     document.getElementById('travel-progress-fill').style.width = `${percentage}%`;
 };
-
-// POPRAVLJEN SETUP ZA DRAG & MOVE
+ 
 const setupZoomAndPan = () => {
     const mapContainer = document.querySelector('.map-box');
     const svgElement = document.querySelector('#world-map-svg svg');
