@@ -610,7 +610,7 @@ button.small {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-height: 50vh;
+  max-height: 55vh;
 }
 
 .countries-list {
@@ -644,20 +644,31 @@ button.small {
     justify-content: center;
 }
 
-#world-map-svg svg {
-    width: 100% !important;
-    height: 100% !important; 
-    object-fit: contain; 
+#world-map-svg path {
+    fill: rgba(157, 78, 221, 0.15) !important; /* Poluprovidna ljubičasta */
+    stroke: rgba(157, 78, 221, 0.3) !important; /* Ivice država */
+    stroke-width: 0.5;
+    transition: fill 0.3s ease;
 }
- 
+
+/* Hover efekat - malo jača ljubičasta */
 #world-map-svg path:hover {
-    fill: rgba(157, 78, 221, 0.4);
+    fill: rgba(157, 78, 221, 0.5) !important;
     cursor: pointer;
 }
- 
+
+/* Posećene države - tvoja Accent ljubičasta (puna boja) */
 #world-map-svg path.visited {
     fill: var(--accent) !important;
-    filter: drop-shadow(0 0 5px var(--glow));
+    filter: drop-shadow(0 0 8px var(--glow));
+}
+
+/* Osiguraj da pozadina samog SVG-a bude providna */
+#world-map-svg svg {
+    background: transparent !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
 }
 
 .country-item {
