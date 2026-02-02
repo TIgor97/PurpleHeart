@@ -23,6 +23,7 @@ const authKey = "purple-heart-auth";
 const EXPIRY_MS = 24 * 60 * 60 * 1000;
 const notificationIcon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Ctext x='0' y='96' font-size='96'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E";
+let firebaseDb = null;
 
 const getStoredState = () => {
   const stored = localStorage.getItem(storageKey);
@@ -91,6 +92,48 @@ const showToast = (message, type = "") => {
   }, 2500);
 };
 
+const playCelebrationSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const now = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99];
+    notes.forEach((freq, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.value = freq;
+      osc.type = "sine";
+      gain.gain.value = 0.0001;
+      osc.connect(gain).connect(ctx.destination);
+      const start = now + index * 0.18;
+      gain.gain.exponentialRampToValueAtTime(0.2, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.6);
+      osc.start(start);
+      osc.stop(start + 0.7);
+    });
+    setTimeout(() => ctx.close(), 1200);
+  } catch (error) {
+    return;
+  }
+};
+
+const launchCelebrationHearts = (count = 18) => {
+  for (let i = 0; i < count; i += 1) {
+    const heart = document.createElement("div");
+    heart.className = "celebration-heart";
+    heart.textContent = "💜";
+    const x = (Math.random() - 0.5) * 300;
+    const y = (Math.random() - 0.5) * 200;
+    heart.style.left = `${50 + Math.random() * 10}%`;
+    heart.style.top = `${45 + Math.random() * 10}%`;
+    heart.style.setProperty("--x", `${x}px`);
+    heart.style.setProperty("--y", `${y}px`);
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 1600);
+  }
+};
+
 const getPartnerEmail = (email) => {
   if (!email) return null;
   const others = APP_CONFIG.allowedEmails.filter((entry) => entry !== email);
@@ -133,6 +176,20 @@ const initAnniversaryPopup = (db) => {
     activeDoc = null;
   });
 
+  const showPopup = (data) => {
+    title.textContent = data.title || "Anniversary";
+    message.textContent = data.message || "";
+    if (data.image) {
+      image.src = data.image;
+      image.style.display = "block";
+    } else {
+      image.style.display = "none";
+    }
+    popup.classList.add("show");
+    launchCelebrationHearts();
+    playCelebrationSound();
+  };
+
   const listenForPosts = (email) => {
     if (!email) return;
     db.collection("anniversaryPosts")
@@ -145,19 +202,58 @@ const initAnniversaryPopup = (db) => {
         const doc = snapshot.docs[0];
         const data = doc.data();
         activeDoc = doc.id;
-        title.textContent = data.title || "Anniversary";
-        message.textContent = data.message || "";
-        if (data.image) {
-          image.src = data.image;
-          image.style.display = "block";
-        } else {
-          image.style.display = "none";
-        }
-        popup.classList.add("show");
+        showPopup(data);
       });
   };
 
-  return listenForPosts;
+  return { listenForPosts, showPopup };
+};
+
+const listenForCelebrations = (db, email) => {
+  if (!db || !email) return;
+  db.collection("celebrations")
+    .where("to", "==", email)
+    .where("seen", "==", false)
+    .orderBy("createdAt", "desc")
+    .limit(1)
+    .onSnapshot((snapshot) => {
+      if (snapshot.empty) return;
+      const doc = snapshot.docs[0];
+      const data = doc.data();
+      const popup = document.getElementById("anniversary-popup");
+      const title = document.getElementById("anniversary-title");
+      const message = document.getElementById("anniversary-message");
+      const image = document.getElementById("anniversary-image");
+      if (!popup || !title || !message || !image) return;
+      title.textContent = data.title || "Celebration";
+      message.textContent = data.message || "";
+      if (data.image) {
+        image.src = data.image;
+        image.style.display = "block";
+      } else {
+        image.style.display = "none";
+      }
+      popup.classList.add("show");
+      launchCelebrationHearts();
+      playCelebrationSound();
+      db.collection("celebrations").doc(doc.id).update({
+        seen: true,
+        seenAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+};
+
+const sendCelebration = async (payload) => {
+  if (!firebaseDb) return;
+  try {
+    await firebaseDb.collection("celebrations").add({
+      ...payload,
+      seen: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    showToast("Failed to send celebration", "error");
+  }
 };
 
 const loadUserState = (email) => {
@@ -885,6 +981,20 @@ const initForms = () => {
     saveState();
     renderMemoryGallery("memories-gallery", state.memoryImages);
     renderMemoryPreview();
+    if (state.activeUser) {
+      const partner = getPartnerEmail(state.activeUser);
+      if (partner) {
+        sendCelebration({
+          title: "New memory 💜",
+          message: data.get("caption") || "A new memory was added.",
+          image: data.get("url") || "",
+          from: state.activeUser,
+          to: partner
+        });
+      }
+      launchCelebrationHearts();
+      playCelebrationSound();
+    }
   });
 
   bindForm("collage-form", (data) => {
@@ -1039,11 +1149,13 @@ const initApp = () => {
   initServiceWorker();
   const firebaseBundle = initFirebase();
   const db = firebaseBundle?.db || null;
+  firebaseDb = db;
   const firebaseAuth = firebaseBundle?.auth || null;
   setupConfigAdmin(firebaseAuth);
-  const listenForPosts = initAnniversaryPopup(db);
-  if (listenForPosts && state.activeUser) {
-    listenForPosts(state.activeUser);
+  const anniversaryPopup = initAnniversaryPopup(db);
+  if (anniversaryPopup?.listenForPosts && state.activeUser) {
+    anniversaryPopup.listenForPosts(state.activeUser);
+    listenForCelebrations(db, state.activeUser);
   }
   const anniversaryForm = document.getElementById("anniversary-form");
   if (anniversaryForm && db) {
@@ -1072,12 +1184,44 @@ const initApp = () => {
           seen: false,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        sendCelebration({
+          title: "Anniversary surprise 💜",
+          message,
+          image: image || "",
+          from: state.activeUser,
+          to: partner
+        });
+        launchCelebrationHearts();
+        playCelebrationSound();
         showToast("Sent to your love 💜", "success");
         anniversaryForm.reset();
       } catch (error) {
         showToast("Failed to send", "error");
       }
     });
+  }
+
+  if (state.activeUser && db) {
+    const today = new Date().toISOString().slice(5, 10);
+    const key = `milestone-${state.activeUser}-${today}`;
+    if (!localStorage.getItem(key)) {
+      const milestone = APP_CONFIG.events.find((event) => event.date.slice(5) === today);
+      if (milestone) {
+        const partner = getPartnerEmail(state.activeUser);
+        if (partner) {
+          sendCelebration({
+            title: `${milestone.title} 💜`,
+            message: "Celebrating our milestone today!",
+            image: "",
+            from: state.activeUser,
+            to: partner
+          });
+        }
+        launchCelebrationHearts();
+        playCelebrationSound();
+        localStorage.setItem(key, "sent");
+      }
+    }
   }
 };
 

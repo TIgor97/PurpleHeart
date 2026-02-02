@@ -12,7 +12,7 @@
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='0' y='50' font-size='28' fill='%239d4edd' fill-opacity='0.12'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E");
   background-size: 120px;
-  animation: floatHearts 26s linear infinite;
+  animation: floatHearts 32s ease-in-out infinite;
   opacity: 0.7;
   z-index: 0;
 }
@@ -26,7 +26,7 @@
 .hearts-layer.near {
   background-size: 90px;
   opacity: 0.85;
-  animation-duration: 18s;
+  animation-duration: 22s;
 }
 
 @keyframes floatHearts {
@@ -35,11 +35,11 @@
   }
 
   50% {
-    transform: translateY(-120px) translateX(40px);
+    transform: translateY(-80px) translateX(30px);
   }
 
   100% {
-    transform: translateY(-240px) translateX(-20px);
+    transform: translateY(-160px) translateX(-10px);
   }
 }
 
@@ -118,6 +118,22 @@
   }
 
   40% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(var(--x), var(--y)) scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes celebrationBurst {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+
+  30% {
     opacity: 1;
   }
 
