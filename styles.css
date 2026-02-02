@@ -713,7 +713,7 @@ button.small {
     border: 1px solid var(--border);
     border-radius: 1.5rem;
     position: relative;
-    height: 500px; 
+    height: 550px; 
     width: 100%;
     overflow: hidden;  
     display: flex;
